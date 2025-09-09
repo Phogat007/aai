@@ -4,6 +4,7 @@ import { PageLayout } from "@/components/layout/PageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { navigateToAgents } from "@/utils/navigationUtils";
 import { Check, Brain, Shield, Zap, Users, BarChart, Globe } from "lucide-react";
 
 const Features = () => {
@@ -96,7 +97,7 @@ const Features = () => {
               <Button size="lg" onClick={() => navigate("/signup")}>
                 Start Free Trial
               </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate("/agents")}>
+              <Button size="lg" variant="outline" onClick={() => navigateToAgents(navigate)}>
                 Explore AI Agents
               </Button>
             </div>

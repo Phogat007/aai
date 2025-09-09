@@ -1,12 +1,15 @@
 
-import { useEffect } from "react";
+import { useEffect, Suspense, lazy } from "react";
 import { HeroSection } from "@/components/home/HeroSection";
 import { FeatureCard } from "@/components/home/FeatureCard";
-import { AgentShowcase } from "@/components/home/AgentShowcase";
-import { ChatPreview } from "@/components/home/ChatPreview";
-import { StatsSection } from "@/components/home/StatsSection";
-import { PricingSection } from "@/components/home/PricingSection";
-import { Footer } from "@/components/layout/Footer";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+
+// Lazy load components that are below the fold
+const AgentShowcase = lazy(() => import("@/components/home/AgentShowcase").then(module => ({ default: module.AgentShowcase })));
+const ChatPreview = lazy(() => import("@/components/home/ChatPreview").then(module => ({ default: module.ChatPreview })));
+const StatsSection = lazy(() => import("@/components/home/StatsSection").then(module => ({ default: module.StatsSection })));
+const PricingSection = lazy(() => import("@/components/home/PricingSection").then(module => ({ default: module.PricingSection })));
+const Footer = lazy(() => import("@/components/layout/Footer").then(module => ({ default: module.Footer })));
 
 const Index = () => {
   useEffect(() => {
@@ -57,11 +60,21 @@ const Index = () => {
         </div>
       </section>
 
-      <AgentShowcase />
-      <ChatPreview />
-      <StatsSection />
-      <PricingSection />
-      <Footer />
+      <Suspense fallback={<LoadingSpinner className="py-20" />}>
+        <AgentShowcase />
+      </Suspense>
+      <Suspense fallback={<LoadingSpinner className="py-20" />}>
+        <ChatPreview />
+      </Suspense>
+      <Suspense fallback={<LoadingSpinner className="py-20" />}>
+        <StatsSection />
+      </Suspense>
+      <Suspense fallback={<LoadingSpinner className="py-20" />}>
+        <PricingSection />
+      </Suspense>
+      <Suspense fallback={<LoadingSpinner className="py-20" />}>
+        <Footer />
+      </Suspense>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getAgentResponse, sampleSources } from "@/utils/messageUtils";
 import { Message, Agent } from "@/types/chat";
 import useSpeechRecognition from "@/hooks/useSpeechRecognition";
@@ -12,11 +12,9 @@ export function useChat(currentAgent: Agent) {
   
   const { isListening, transcription, startListening, stopListening, resetTranscription } = useSpeechRecognition();
   
-  // Set page title and add welcome message
   useEffect(() => {
     document.title = `Chat with ${currentAgent.name} - aai`;
     
-    // Add welcome message if no messages
     if (messages.length === 0) {
       const welcomeMessage: Message = {
         id: `welcome-${Date.now()}`,
@@ -32,24 +30,7 @@ export function useChat(currentAgent: Agent) {
     }
   }, [currentAgent, messages.length]);
   
-  // Handle voice transcription updates
-  useEffect(() => {
-    if (isListening && transcription) {
-      // Auto-send the message after a pause in speech
-      const timer = setTimeout(() => {
-        if (transcription.trim() && isListening) {
-          handleSendMessage(transcription);
-          resetTranscription();
-          stopListening();
-        }
-      }, 2000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [transcription, isListening]);
-
-  const handleSendMessage = (content: string, attachment?: { type: "image"; url: string }) => {
-    // Add user message
+  const handleSendMessage = useCallback((content: string, attachment?: { type: "image"; url: string }) => {
     const userMessage: Message = {
       id: `user-${Date.now()}`,
       role: "user",
@@ -61,16 +42,12 @@ export function useChat(currentAgent: Agent) {
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
     
-    // Simulate response delay
     setTimeout(() => {
       let responseContent = getAgentResponse(content, currentAgent.id);
       
-      // If there's an image, add a comment about it
       if (attachment?.type === "image") {
         responseContent = `I see you've shared an image. ${responseContent}`;
       }
-      
-      // Add agent response
       const agentMessage: Message = {
         id: `agent-${Date.now()}`,
         role: "agent",
@@ -86,12 +63,24 @@ export function useChat(currentAgent: Agent) {
       setMessages(prev => [...prev, agentMessage]);
       setIsLoading(false);
     }, 1500);
-  };
+  }, [currentAgent.id, currentAgent.emoji, currentAgent.specialty]);
+
+  useEffect(() => {
+    if (isListening && transcription) {
+      const timer = setTimeout(() => {
+        if (transcription.trim() && isListening) {
+          handleSendMessage(transcription);
+          resetTranscription();
+          stopListening();
+        }
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [transcription, isListening, handleSendMessage, resetTranscription, stopListening]);
 
   const handleClearChat = () => {
     setMessages([]);
-    
-    // Welcome message will be added automatically by the useEffect
   };
   
   const handleVoiceStart = () => {

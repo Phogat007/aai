@@ -1,7 +1,6 @@
 
 import { Source } from "@/types/chat";
 
-// Sample sources
 export const sampleSources: Source[] = [
   {
     title: "Principles of Learning and Teaching",
@@ -21,9 +20,7 @@ export const sampleSources: Source[] = [
   }
 ];
 
-// Sample agent responses based on agent type
 export function getAgentResponse(message: string, agentId: string): string {
-  // In a real app, this would call an API to get responses from the AI
   const responses: Record<string, string[]> = {
     "teacher": [
       "Based on educational research, there are several effective approaches to explaining this concept. Let me break it down in age-appropriate terms...",
@@ -52,7 +49,6 @@ export function getAgentResponse(message: string, agentId: string): string {
     ]
   };
   
-  // Default response if agent type not found
   const defaultResponses = [
     "Based on authoritative sources, I can provide the following information about your question...",
     "According to verified references, the most accurate answer to your question involves...",
@@ -61,7 +57,6 @@ export function getAgentResponse(message: string, agentId: string): string {
   
   const agentResponses = responses[agentId] || defaultResponses;
   
-  // Select a random response
   return agentResponses[Math.floor(Math.random() * agentResponses.length)];
 }
 

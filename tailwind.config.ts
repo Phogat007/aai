@@ -63,7 +63,6 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Agent specific colors
 				teacher: {
 				  DEFAULT: '#3B82F6', // blue
 				  light: '#DBEAFE',
@@ -184,5 +183,6 @@ export default {
 			}
 		}
 	},
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	plugins: [require("tailwindcss-animate")],
 } satisfies Config;

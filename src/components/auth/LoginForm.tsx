@@ -7,13 +7,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff, LogIn, Mail, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { validatePassword, calculatePasswordStrength, PASSWORD_STRENGTH_LABELS, FORM_CONTAINER_CLASSES } from "@/utils/formUtils";
+import { handleAuthSuccess, handleAuthError, handleOAuthAuth, simulateAuthCall } from "@/utils/authUtils";
 
-const passwordStrengthText = [
-  "Too weak",
-  "Could be stronger",
-  "Strong enough",
-  "Very strong",
-];
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -24,33 +20,23 @@ export function LoginForm() {
   
   const navigate = useNavigate();
 
-  const passwordStrength = password.length < 8 
-    ? 0 
-    : password.length < 12 
-      ? 1 
-      : /[A-Z]/.test(password) && /[0-9]/.test(password) 
-        ? 3 
-        : 2;
+  const passwordStrength = calculatePasswordStrength(password);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email || !password) {
-      toast.error("Please fill in all fields");
+      handleAuthError("Please fill in all fields");
       return;
     }
     
     setIsLoading(true);
     
     try {
-      // In a real app, this would authenticate with a backend
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Success!
-      toast.success("Login successful!");
-      navigate("/agents");
+      await simulateAuthCall(1000);
+      handleAuthSuccess("Login successful!", navigate);
     } catch (error) {
-      toast.error("Login failed. Please check your credentials.");
+      handleAuthError("Login failed. Please check your credentials.");
     } finally {
       setIsLoading(false);
     }
@@ -62,17 +48,12 @@ export function LoginForm() {
 
   const handleOAuthLogin = (provider: string) => {
     setIsLoading(true);
-    
-    // In a real app, this would authenticate with OAuth provider
-    setTimeout(() => {
-      toast.success(`${provider} login successful!`);
-      navigate("/agents");
-      setIsLoading(false);
-    }, 1000);
+    handleOAuthAuth(provider, navigate, 1000);
+    setIsLoading(false);
   };
 
   return (
-    <div className="w-full max-w-md space-y-8 p-8 rounded-2xl bg-white dark:bg-gray-900 shadow-lg animate-scale-in">
+    <div className={FORM_CONTAINER_CLASSES}>
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
         <p className="text-muted-foreground">Sign in to your aai account</p>
@@ -152,7 +133,7 @@ export function LoginForm() {
                   ))}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {passwordStrengthText[passwordStrength]}
+                  {PASSWORD_STRENGTH_LABELS[passwordStrength]}
                 </p>
               </div>
             )}

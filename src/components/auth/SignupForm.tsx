@@ -7,6 +7,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff, UserPlus, Mail, Lock, User, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { validatePassword, FORM_CONTAINER_CLASSES } from "@/utils/formUtils";
+import { handleAuthSuccess, handleAuthError, handleOAuthSignup as handleOAuthSignupUtil, simulateAuthCall } from "@/utils/authUtils";
 
 export function SignupForm() {
   const [name, setName] = useState("");
@@ -18,43 +20,34 @@ export function SignupForm() {
   
   const navigate = useNavigate();
 
-  // Password requirements
-  const hasMinLength = password.length >= 8;
-  const hasUppercase = /[A-Z]/.test(password);
-  const hasNumber = /[0-9]/.test(password);
-  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-  
-  const isPasswordValid = hasMinLength && hasUppercase && hasNumber && hasSpecialChar;
+  const passwordValidation = validatePassword(password);
+  const { hasMinLength, hasUppercase, hasNumber, hasSpecialChar, isValid: isPasswordValid } = passwordValidation;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!name || !email || !password) {
-      toast.error("Please fill in all required fields");
+      handleAuthError("Please fill in all required fields");
       return;
     }
     
     if (!isPasswordValid) {
-      toast.error("Please meet all password requirements");
+      handleAuthError("Please meet all password requirements");
       return;
     }
     
     if (!agreedToTerms) {
-      toast.error("You must agree to the terms of service");
+      handleAuthError("You must agree to the terms of service");
       return;
     }
     
     setIsLoading(true);
     
     try {
-      // In a real app, this would create an account with a backend
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Success!
-      toast.success("Account created successfully!");
-      navigate("/agents");
+      await simulateAuthCall(1500);
+      handleAuthSuccess("Account created successfully!", navigate);
     } catch (error) {
-      toast.error("Failed to create account. Please try again.");
+      handleAuthError("Failed to create account. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -62,17 +55,12 @@ export function SignupForm() {
 
   const handleOAuthSignup = (provider: string) => {
     setIsLoading(true);
-    
-    // In a real app, this would authenticate with OAuth provider
-    setTimeout(() => {
-      toast.success(`${provider} account connected!`);
-      navigate("/agents");
-      setIsLoading(false);
-    }, 1000);
+    handleOAuthSignupUtil(provider, navigate, 1000);
+    setIsLoading(false);
   };
 
   return (
-    <div className="w-full max-w-md space-y-8 p-8 rounded-2xl bg-white dark:bg-gray-900 shadow-lg animate-scale-in">
+    <div className={FORM_CONTAINER_CLASSES}>
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">Create an account</h1>
         <p className="text-muted-foreground">Join aai and start exploring with AI assistants</p>

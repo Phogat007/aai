@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import { getAgentColors } from "@/utils/agentUtils";
 
 interface AgentCardProps {
   agent: {
@@ -22,36 +23,7 @@ export function AgentCard({ agent }: AgentCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
   
-  // Map color string to Tailwind classes
-  const colorMap: Record<string, { bg: string, text: string, light: string }> = {
-    "teacher": { 
-      bg: "bg-teacher", 
-      text: "text-teacher", 
-      light: "bg-teacher-light" 
-    },
-    "lawyer": { 
-      bg: "bg-lawyer", 
-      text: "text-lawyer", 
-      light: "bg-lawyer-light" 
-    },
-    "doctor": { 
-      bg: "bg-doctor", 
-      text: "text-doctor", 
-      light: "bg-doctor-light" 
-    },
-    "finance": { 
-      bg: "bg-finance", 
-      text: "text-finance", 
-      light: "bg-finance-light" 
-    },
-    "chef": { 
-      bg: "bg-chef", 
-      text: "text-chef", 
-      light: "bg-chef-light" 
-    },
-  };
-  
-  const colorClasses = colorMap[agent.color] || { bg: "bg-primary", text: "text-primary", light: "bg-primary/10" };
+  const colorClasses = getAgentColors(agent.color);
 
   const handleChatClick = () => {
     navigate(`/chat/${agent.id}`);

@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, SlidersHorizontal } from "lucide-react";
 
-// Sample agent data
 const agentsData = [
   {
     id: "teacher",
@@ -72,11 +71,9 @@ const Agents = () => {
     document.title = "Choose your Agent - aai";
   }, []);
   
-  // Update filtered agents based on search, sort, and filter criteria
   useEffect(() => {
     let result = [...agentsData];
     
-    // Apply search filter
     if (searchTerm) {
       const lowercasedSearch = searchTerm.toLowerCase();
       result = result.filter(
@@ -87,18 +84,15 @@ const Agents = () => {
       );
     }
     
-    // Apply category filter
     if (selectedCategory !== "all") {
       result = result.filter(agent => agent.id === selectedCategory);
     }
     
-    // Apply sorting
     if (sortBy === "popular") {
       result.sort((a, b) => (b.totalUsage || 0) - (a.totalUsage || 0));
     } else if (sortBy === "quality") {
       result.sort((a, b) => b.sourceQuality - a.sourceQuality);
     }
-    // Default is "featured" which uses the original order
     
     setFilteredAgents(result);
   }, [searchTerm, sortBy, selectedCategory]);

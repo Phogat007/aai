@@ -19,7 +19,6 @@ export function MessageFeedback({ content }: MessageFeedbackProps) {
   
   const handleFeedback = (type: "positive" | "negative") => {
     setFeedbackGiven(type);
-    // In a real app, send feedback to backend
   };
 
   return (

@@ -6,7 +6,6 @@ import * as React from "react";
 export function HeroSection() {
   const navigate = useNavigate();
 
-  // Smooth scroll to demo section
   const handleSeeHowItWorks = () => {
     const el = document.getElementById("demo-section");
     if (el) {

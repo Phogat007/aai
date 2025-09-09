@@ -2,13 +2,26 @@
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
+interface SpeechRecognitionResult {
+  [index: number]: {
+    [index: number]: {
+      transcript: string;
+    };
+  };
+  length: number;
+}
+
+interface SpeechRecognitionErrorEvent {
+  error: string;
+}
+
 interface SpeechRecognitionInstance {
   continuous: boolean;
   interimResults: boolean;
   start: () => void;
   stop: () => void;
-  onresult: (event: any) => void;
-  onerror: (event: any) => void;
+  onresult: (event: { results: SpeechRecognitionResult }) => void;
+  onerror: (event: SpeechRecognitionErrorEvent) => void;
 }
 
 interface UseSpeechRecognitionResult {
@@ -25,18 +38,17 @@ export function useSpeechRecognition(): UseSpeechRecognitionResult {
   const recognition = useRef<SpeechRecognitionInstance | null>(null);
 
   useEffect(() => {
-    // Check if SpeechRecognition is available
+    
     if (typeof window !== "undefined") {
-      // Use type assertion with window as any to handle browser-specific implementations
-      const SpeechRecognition = (window as any).SpeechRecognition || 
-                               (window as any).webkitSpeechRecognition;
+      const SpeechRecognition = (window as unknown as { SpeechRecognition?: new() => SpeechRecognitionInstance }).SpeechRecognition || 
+                               (window as unknown as { webkitSpeechRecognition?: new() => SpeechRecognitionInstance }).webkitSpeechRecognition;
       
       if (SpeechRecognition) {
         recognition.current = new SpeechRecognition();
         recognition.current.continuous = true;
         recognition.current.interimResults = true;
         
-        recognition.current.onresult = (event: any) => {
+        recognition.current.onresult = (event: { results: SpeechRecognitionResult }) => {
           let transcript = '';
           for (let i = 0; i < event.results.length; i++) {
             transcript += event.results[i][0].transcript;
@@ -44,7 +56,7 @@ export function useSpeechRecognition(): UseSpeechRecognitionResult {
           setTranscription(transcript);
         };
         
-        recognition.current.onerror = (event: any) => {
+        recognition.current.onerror = (event: SpeechRecognitionErrorEvent) => {
           console.error('Speech recognition error', event.error);
           setIsListening(false);
           toast.error("Voice recognition error: " + event.error);
@@ -57,7 +69,7 @@ export function useSpeechRecognition(): UseSpeechRecognitionResult {
         recognition.current.stop();
       }
     };
-  }, []);
+  }, [isListening]);
 
   const startListening = () => {
     if (recognition.current) {

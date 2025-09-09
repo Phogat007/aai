@@ -59,7 +59,6 @@ export function PricingSection() {
     if (planName === "Free") {
       navigate("/signup");
     } else if (planName === "Enterprise") {
-      // Contact sales action
       window.open("mailto:sales@aai.com?subject=Enterprise Plan Inquiry", "_blank");
     } else {
       navigate("/pricing");

@@ -1,7 +1,7 @@
 
 import { useMemo } from "react";
+import { getAgentColors } from "@/utils/agentUtils";
 
-// Sample agent data (in a real app, this would come from an API)
 const agentsData = [
   {
     id: "teacher",
@@ -51,42 +51,12 @@ export function useAgentData(agentId: string) {
   }, [agentId]);
 
   const getAgentStyles = (id: string | undefined) => {
-    const colorMap: Record<string, { bg: string, textColor: string, avatarBg: string }> = {
-      "teacher": { 
-        bg: "bg-teacher-light", 
-        textColor: "text-teacher-dark", 
-        avatarBg: "bg-teacher" 
-      },
-      "lawyer": { 
-        bg: "bg-lawyer-light", 
-        textColor: "text-lawyer-dark", 
-        avatarBg: "bg-lawyer" 
-      },
-      "doctor": { 
-        bg: "bg-doctor-light", 
-        textColor: "text-doctor-dark", 
-        avatarBg: "bg-doctor" 
-      },
-      "financial": { 
-        bg: "bg-finance-light", 
-        textColor: "text-finance-dark", 
-        avatarBg: "bg-finance" 
-      },
-      "chef": { 
-        bg: "bg-chef-light", 
-        textColor: "text-chef-dark", 
-        avatarBg: "bg-chef" 
-      },
-      "default": { 
-        bg: "bg-secondary", 
-        textColor: "text-secondary-foreground", 
-        avatarBg: "bg-primary" 
-      }
+    const colors = getAgentColors(id || "default");
+    return {
+      bg: colors.light,
+      textColor: colors.textColor || colors.text,
+      avatarBg: colors.avatarBg || colors.bg
     };
-    
-    return id && colorMap[id] 
-      ? colorMap[id] 
-      : colorMap.default;
   };
 
   const suggestions = useMemo(() => {
@@ -101,7 +71,6 @@ export function useAgentData(agentId: string) {
   };
 }
 
-// Sample suggestions based on agent type
 function getSuggestions(agentId: string): string[] {
   switch (agentId) {
     case "teacher":

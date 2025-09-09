@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Mic, MicOff, Paperclip, Plus, Send, Image } from "lucide-react";
 import { toast } from "sonner";
+import { getAgentColors } from "@/utils/agentUtils";
 
 interface ChatInputBoxProps {
   onSendMessage: (message: string, attachment?: { type: "image", url: string }) => void;
@@ -34,39 +35,7 @@ export function ChatInputBox({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Configure styling based on agent type
-  const getAgentStyles = () => {
-    const colorMap: Record<string, { bg: string, hoverBg: string }> = {
-      "teacher": { 
-        bg: "bg-teacher", 
-        hoverBg: "hover:bg-teacher-dark" 
-      },
-      "lawyer": { 
-        bg: "bg-lawyer", 
-        hoverBg: "hover:bg-lawyer-dark" 
-      },
-      "doctor": { 
-        bg: "bg-doctor", 
-        hoverBg: "hover:bg-doctor-dark" 
-      },
-      "financial": { 
-        bg: "bg-finance", 
-        hoverBg: "hover:bg-finance-dark" 
-      },
-      "chef": { 
-        bg: "bg-chef", 
-        hoverBg: "hover:bg-chef-dark" 
-      },
-      "default": { 
-        bg: "bg-primary", 
-        hoverBg: "hover:bg-primary/90" 
-      }
-    };
-    
-    return colorMap[agentId] || colorMap.default;
-  };
-
-  const agentStyles = getAgentStyles();
+  const agentStyles = getAgentColors(agentId);
   
   const handleSubmit = () => {
     if ((message.trim() || uploadedImage) && !isLoading) {
@@ -78,7 +47,6 @@ export function ChatInputBox({
       }
       setMessage("");
       
-      // Focus the textarea after sending
       if (textareaRef.current) {
         textareaRef.current.focus();
       }
@@ -93,7 +61,6 @@ export function ChatInputBox({
   };
   
   const toggleRecording = () => {
-    // Toggle voice recording state
     if (!isRecording) {
       setIsRecording(true);
       if (onStartVoice) onStartVoice();
